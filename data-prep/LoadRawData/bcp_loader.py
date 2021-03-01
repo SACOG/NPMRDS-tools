@@ -140,6 +140,8 @@ class BCP():
             else:
                 return f"'{in_tstamp_str}'"
         
+        
+        
         try:
             temp_output_file = f"{os.path.splitext(os.path.basename(in_file))[0]}_str_ts.csv"
             output_dir = os.path.dirname(in_file)
@@ -164,12 +166,12 @@ class BCP():
                         
                     if i % 1000000 == 0: print(f"{i} rows quoted...")
             
-            # import pdb; pdb.set_trace()
             return temp_output_fpath
             
             writer_out.close()
         except:
-            trace()
+            err_msg = f"Error adding quotes to date-time field. More info: {trace()}"
+            raise Exception(err_msg)
             
         
 
@@ -281,7 +283,6 @@ class BCP():
         try:
             subprocess.check_output(bcp_new_tbl_from_file)
             
-            # import pdb; pdb.set_trace()
             if dt_cols:
                 print("loading from staging table into final table for conversion to tstamp...")
                 str_load2final_sql = str_load2final_sql.format(tbl_name, tbl_name_final)

@@ -21,7 +21,7 @@ from bcp_loader import BCP
 
 
 class RawTTCSV():
-    def __init__(self, data_dir, data_year, vehtype, tmc_extent='alltmc', tbl_name_addl=''):
+    def __init__(self, data_dir, data_year, vehtype, tmc_extent, tbl_name_addl=''):
         '''
         Parameters
         ----------
@@ -44,6 +44,7 @@ class RawTTCSV():
         self.data_dir = data_dir
         self.csv_name = f"{os.path.basename(self.data_dir)}.csv"
         self.csv_path = os.path.join(self.data_dir, self.csv_name)
+        # import pdb; pdb.set_trace()
         
         # build a table name for SQL server
         self.vehtype_dict = {'all': 'paxtruck_comb', 'passenger': 'paxveh',
@@ -64,7 +65,7 @@ class RawTTCSV():
 
 class DataSet():
     # define where the data are, file names, etc.
-    def __init__(self, data_year, truck_data_dir=None, pax_data_dir=None, comb_data_dir=None):
+    def __init__(self, data_year, truck_data_dir=None, pax_data_dir=None, comb_data_dir=None, tmc_extent='all'):
         '''
         Parameters
         ----------
@@ -99,7 +100,7 @@ class DataSet():
         self.sql_tt_load2final = 'tt_tbl_load2final.sql'
         
         
-        self.tmc_extent = 'alltmc'
+        self.tmc_extent = f"{tmc_extent}tmc"
         
         
         self.data_dir_list = []
@@ -112,6 +113,8 @@ class DataSet():
         if comb_data_dir:
             self.data_comb = RawTTCSV(comb_data_dir, data_year, 'all', tmc_extent=self.tmc_extent, tbl_name_addl='')
             self.data_dir_list.append(self.data_comb)
+            
+        # import pdb; pdb.set_trace()
         
         # get TMC specification CSV
         first_data_dir = self.data_dir_list[0].data_dir
@@ -121,7 +124,7 @@ class DataSet():
         self.speccol_enddate = 'active_end_date'
         
         # columns
-        self.col_timestamp = 'measurement_tstamp'
+        self.cols_timestamp = ['measurement_tstamp']
     
     def sql_str_from_file(self, in_sql_file, *formatter_args):
         '''PARAMETERS:
@@ -158,15 +161,17 @@ class DataSet():
         qry_load2svr = os.path.join(self.qry_dir, 'create_tt_table_2ph.sql')
         qry_load2final = os.path.join(self.qry_dir, 'tt_tbl_load2final.sql')
 
+        
         for data in self.data_dir_list:
             print(f"loading {data.csv_name} to {data.sql_server_table_name}...")
             str_sql_load2svr = self.sql_str_from_file(qry_load2svr)
             str_sql_load2final = self.sql_str_from_file(qry_load2final)
+
           
             self.BCP_conn.create_sql_table_from_file(file_in=data.csv_path, 
                                                      str_create_table_sql=str_sql_load2svr,
                                                      tbl_name=data.sql_server_table_name,
-                                                     dt_cols=self.col_timestamp,
+                                                     dt_cols=self.cols_timestamp,
                                                      str_load2final_sql=str_sql_load2final)
             
         if load_tmc_spectable:
@@ -175,20 +180,25 @@ class DataSet():
 
 
 if __name__ == '__main__':
-    parent_dir = r"P:\NPMRDS data\Raw Downloads\DynamicData_15Min\2020"
-    datayear = 2020
+    parent_dir = r"P:\NPMRDS data\Raw Downloads\DynamicData_15Min\2021"
+    datayear = 2021
 
-    truckdir = os.path.join(parent_dir, 'NPMRDS2020_Trucks')
-    paxdir = os.path.join(parent_dir, 'NPMRDS2020_Pax')
-    combdir = os.path.join(parent_dir, 'NPMRDS2020_TruckPaxComb')
+    datafolder_trucks = 'NPMRDS2020_Trucks'
+    datafolder_truckspax = 'PaxTruck_Jan2021_nhs'
+    datafolder_pax = 'NPMRDS2020_TruckPaxComb'
     
+    tmc_reach = 'nhs'
+
+
+    # ================BEGIN SCRIPT=======================
+    truckdir = os.path.join(parent_dir, datafolder_trucks)
+    paxdir = os.path.join(parent_dir, datafolder_pax)
+    combdir = os.path.join(parent_dir, datafolder_truckspax)
     
+    # loader = DataSet(data_year=datayear, truck_data_dir=truckdir,
+    #                    pax_data_dir=paxdir, comb_data_dir=combdir)
     
-    # test_obj = DataSet(data_year=datayear, truck_data_dir=truckdir,
-    #                 pax_data_dir=paxdir, comb_data_dir=combdir)
+    loader = DataSet(data_year=datayear, comb_data_dir=combdir, tmc_extent=tmc_reach)
     
-    loader = DataSet(data_year=datayear, truck_data_dir=truckdir,
-                       pax_data_dir=paxdir, comb_data_dir=combdir)
-    
-    # loader.load_to_sql(load_tmc_spectable=False)
+    loader.load_to_sql(load_tmc_spectable=False)
     loader.load_tmc_spectbl(dt_columns=['active_start_date', 'active_end_date'])

@@ -21,7 +21,7 @@ arcpy.env.overwriteOutput = True
 arcpy.env.qualifiedFieldNames = False
 
 class GetAngle(object):
-    def __init__(self, line_fc_in, angle_field, text_dir_field):
+    def __init__(self, line_fc_in, angle_field=None, text_dir_field=None):
         self.line_fc_in = line_fc_in
         self.angle_field = angle_field
         self.text_dir_field = text_dir_field
@@ -47,6 +47,16 @@ class GetAngle(object):
             link_dir = "unknown"
         
         return link_dir
+    
+    def get_card_angle(self, start_x, start_y, end_x, end_y):
+        '''Based on start and end point coordinates, calculates direction in degrees
+        for traveling in straight line between start and end point'''
+        xdiff = end_x - start_x
+        ydiff = end_y - start_y
+        
+        angle_degrees = math.degrees(math.atan2(ydiff,xdiff))
+        
+        return angle_degrees
     
     
     #add angle and direction fields to input links
@@ -81,9 +91,7 @@ class GetAngle(object):
                 end_lon = row[fields.index("SHAPE@")].lastPoint.X
                 #print(start_lat, start_lon, end_lat, end_lon)
                 
-                xdiff = end_lon - start_lon
-                ydiff = end_lat - start_lat
-                link_angle = math.degrees(math.atan2(ydiff,xdiff))
+                link_angle = self.get_card_angle(start_lon, start_lat, end_lon, end_lat)
                 link_dir = self.get_card_dir(link_angle)
     
                 row[fields.index(self.angle_field)] = link_angle

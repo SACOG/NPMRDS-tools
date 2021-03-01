@@ -22,7 +22,7 @@
 import datetime as dt
 import arcpy
 import pandas as pd
-import get_tmc_card_angle_noCopy2 as get_dir
+from GetLineDir import GetAngle
 
 arcpy.env.overwriteOutput = True
 
@@ -91,11 +91,12 @@ for index, row in df_tmcs.iterrows():
 
 del in_cur
 
-#def add_angle_data(tmc_fc_in, lat_start_field, lat_end_field, 
-#                   lon_start_field, lon_end_field, angle_field):
+
 print("adding cardinal direction data...")
-get_dir.add_angle_data(output_fc, fld_start_lat, fld_end_lat, fld_start_lon, 
-                       fld_end_lon)
+
+output_fc_wdirecn = f"{output_fc}_wdirn"
+angle_builder = GetAngle(output_fc, angle_field='c_angle', text_dir_field='Link_Dir')
+angle_builder.add_direction_data(output_fc_wdirecn)
 
 #get_dir.get_card_dir("c_angle", output_fc, fld_dir)
 
