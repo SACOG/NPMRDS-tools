@@ -192,6 +192,10 @@ class BCP():
             str_load2final_sql (string) = optional argument for query that, after data have loaded into a staging table
                 in SQL Server, they are then transferred (using this sql file) to a final table, and during the 
                 transfer have their timestamp field converted to SQL Server datetime format
+            re_dt_format (regex string) = regular expression describing the datetime format.
+                Example: 01-01-2020 14:58:00 would have a regex format of '(\d+-\d+-\d+ \d+:\d+:\d+).*'
+                ***ISSUE: this should be improved in future so it is more intuitive to someone unfamiliar with regex
+            
          '''
          
         start_time = time.perf_counter()
