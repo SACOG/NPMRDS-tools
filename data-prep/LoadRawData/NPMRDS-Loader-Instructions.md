@@ -21,4 +21,20 @@
     utility"*
 
 ## Using the NPMRDS Data Loader
-Currently, the is no interface for the Data Loader (time permitting this will improve). In the meantime, you will need to open load_raw_npmrds_data.py in a python editor, fill in the appropriate parameter values near the bottom of the script, and run the script.
+
+*Setup configuration*
+
+If you've never used the data loader on your machine, you must first set the following parameters in load_raw_npmrds.py:
+
+1. DataSet.server - set to the name of the instance of SQL Server you're connecting to
+2. DataSet.database - set to the name of the database you're loading to
+3. 
+
+*Normal run instructions*
+
+Open "data_load_parameters.csv" and update the input parameter values as applicable, then run the script.
+
+
+
+
+

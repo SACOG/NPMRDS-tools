@@ -5,11 +5,17 @@ Purpose:
         conventions and data types
     <FUTURE FEATURES>
         -tag whether the TMC is in SACOG region or the Tahoe basin
+        -be able to extract directly from zipped file, rather than requiring user
+        to manually extract
         
+INSTRUCTIONS:
+    You should *NOT* have to edit anything in this script. Instead, you should just
+    edit the parameters as needed in data_load_parameters.csv, then just run this script
+    directly     
         
           
 Author: Darren Conly
-Last Updated: Jan 2021
+Last Updated: Mar 2021
 Updated by: <name>
 Copyright:   (c) SACOG
 Python Version: 3.x
@@ -17,7 +23,41 @@ Python Version: 3.x
 
 import os
 
+import numpy as np
+import pandas as pd
+
 from bcp_loader import BCP
+
+class ParamCSV:
+    '''Takse a single CSV as an input that the user fills out the input parameters on'''
+    def __init__(self, in_csv):
+        self.idxcol = "ParamIdxName"
+        self.idxtruck = "DataTruck"
+        self.idxpax = "DataPax"
+        self.idxallveh = "DataAllVeh"
+        self.idxyear = "Year"
+        self.idxtmcext = "TMCExt"
+        
+        self.paramvalcol = 'ParameterValue'
+        self.params_df = pd.read_csv(in_csv, index_col=self.idxcol)
+        
+        # These are the attributes you will use as inputs to run this script
+        self.dir_truck_data = self.get_attr(self.idxtruck)
+        self.dir_pax_data = self.get_attr(self.idxpax)            
+        self.dir_allveh_data = self.get_attr(self.idxallveh)   
+        
+        self.data_year = int(self.get_attr(self.idxyear))
+        self.tmcext = self.get_attr(self.idxtmcext)
+        
+    def get_attr(self, idxval):
+        out_attr = self.params_df[self.paramvalcol].loc[idxval]
+        if out_attr is np.nan:
+            out_attr = None
+        # import pdb; pdb.set_trace()
+        return out_attr
+    
+test = ParamCSV(r"C:\Users\dconly\GitRepos\NPMRDS-tools\data-prep\LoadRawData\data_load_parameters.csv")
+        
 
 
 class RawTTCSV():
@@ -92,7 +132,7 @@ class DataSet():
         
         # queries to run
         self.script_dir = os.path.dirname(os.path.realpath(__file__))
-        self.qry_dir = os.path.join(self.script_dir, "qry")
+        self.qry_dir = "qry" # os.path.join(self.script_dir, "qry")
         
         self.sql_create_tmcspec_tbls = "create_tmc_spec_tables.sql"
         self.sql_tmcspec_load2final = "tmc_spec_load2final.sql"
@@ -158,8 +198,8 @@ class DataSet():
     
     #load specified tables to SQL server
     def load_to_sql(self, load_tmc_spectable=True):
-        qry_load2svr = os.path.join(self.qry_dir, 'create_tt_table_2ph.sql')
-        qry_load2final = os.path.join(self.qry_dir, 'tt_tbl_load2final.sql')
+        qry_load2svr = os.path.join(self.qry_dir, self.sql_create_tt_tbls)
+        qry_load2final = os.path.join(self.qry_dir, self.sql_tt_load2final)
 
         
         for data in self.data_dir_list:
@@ -177,14 +217,27 @@ class DataSet():
         if load_tmc_spectable:
             self.load_tmc_spectbl(dt_columns=[self.speccol_startdate, self.speccol_enddate])
                 
-
+def do_work(param_csv):
+    params = ParamCSV(param_csv)
+    
+    loader = DataSet(data_year=params.datayear, 
+                     truck_data_dir=params.dir_truck_data,
+                     pax_data_dir=params.dir_pax_data,
+                     comb_data_dir=params.dir_allveh_data, 
+                     tmc_extent=params.tmcext)
+    
+    loader.load_to_sql(load_tmc_spectable=False)
+    loader.load_tmc_spectbl(dt_columns=['active_start_date', 'active_end_date'])
 
 if __name__ == '__main__':
+    do_work('data_load_parameters.csv')
+    
+    '''
     parent_dir = r"P:\NPMRDS data\Raw Downloads\DynamicData_15Min\2021"
     datayear = 2021
 
     datafolder_trucks = 'NPMRDS2020_Trucks'
-    datafolder_truckspax = 'PaxTruck_Jan2021_nhs'
+    datafolder_truckspax = 'PaxTruck_Jan2021'
     datafolder_pax = 'NPMRDS2020_TruckPaxComb'
     
     tmc_reach = 'nhs'
@@ -202,3 +255,4 @@ if __name__ == '__main__':
     
     loader.load_to_sql(load_tmc_spectable=False)
     loader.load_tmc_spectbl(dt_columns=['active_start_date', 'active_end_date'])
+    '''
