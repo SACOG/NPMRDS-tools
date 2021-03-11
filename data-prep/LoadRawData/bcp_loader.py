@@ -164,7 +164,7 @@ class BCP():
                     else:
                         writer_out.writerow(list(row.values()))
                         
-                    if i % 1000000 == 0: print(f"{i} rows quoted...")
+                    if i % 1000000 == 0: print(f"\t{i} rows quoted...")
             
             return temp_output_fpath
             

@@ -1,6 +1,6 @@
 ParamIdxName,ParameterDescription,ParameterValue,Notes
 DataTruck,Truck Data Folder,,Leave blank if not loading
-DataAllVeh,Truck-Passenger Combined Data Folder,P:\NPMRDS data\Raw Downloads\DynamicData_15Min\2021\PaxTruck_Jan2021_nhs,Leave blank if not loading
+DataAllVeh,Truck-Passenger Combined Data Folder,P:\NPMRDS data\Raw Downloads\DynamicData_15Min\2021\PaxTruck_Jan2021_all_attempt2,Leave blank if not loading
 DataPax,Passenger Vehicle Data Folder,,Leave blank if not loading
 Year,Data Year,2021,Enter as 4-digit year
 TMCExt,TMC Network Extent ('nhs' or 'all'),all,Must enter 'nhs' or 'all'

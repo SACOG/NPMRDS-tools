@@ -220,7 +220,7 @@ class DataSet():
 def do_work(param_csv):
     params = ParamCSV(param_csv)
     
-    loader = DataSet(data_year=params.datayear, 
+    loader = DataSet(data_year=params.data_year, 
                      truck_data_dir=params.dir_truck_data,
                      pax_data_dir=params.dir_pax_data,
                      comb_data_dir=params.dir_allveh_data, 
@@ -232,27 +232,3 @@ def do_work(param_csv):
 if __name__ == '__main__':
     do_work('data_load_parameters.csv')
     
-    '''
-    parent_dir = r"P:\NPMRDS data\Raw Downloads\DynamicData_15Min\2021"
-    datayear = 2021
-
-    datafolder_trucks = 'NPMRDS2020_Trucks'
-    datafolder_truckspax = 'PaxTruck_Jan2021'
-    datafolder_pax = 'NPMRDS2020_TruckPaxComb'
-    
-    tmc_reach = 'nhs'
-
-
-    # ================BEGIN SCRIPT=======================
-    truckdir = os.path.join(parent_dir, datafolder_trucks)
-    paxdir = os.path.join(parent_dir, datafolder_pax)
-    combdir = os.path.join(parent_dir, datafolder_truckspax)
-    
-    # loader = DataSet(data_year=datayear, truck_data_dir=truckdir,
-    #                    pax_data_dir=paxdir, comb_data_dir=combdir)
-    
-    loader = DataSet(data_year=datayear, comb_data_dir=combdir, tmc_extent=tmc_reach)
-    
-    loader.load_to_sql(load_tmc_spectable=False)
-    loader.load_tmc_spectbl(dt_columns=['active_start_date', 'active_end_date'])
-    '''
