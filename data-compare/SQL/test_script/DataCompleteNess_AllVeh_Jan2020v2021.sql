@@ -24,7 +24,7 @@ USE NPMRDS
 GO
 
 --=======QUERY TO GENERATE ROWS OF EVERY HOUR FOR SPECIFIED TIME PERIOD=================
-DECLARE @DataYear INT = 2021
+DECLARE @DataYear INT = 2020
 DECLARE @EpochLenMins INT = 15
 
 --variables that don't need editing very often, assuming you want 1 calendar year of data
@@ -79,7 +79,7 @@ SELECT
 	eh.poss_epochs_hod,
 	@DataYear AS data_year
 INTO #tmc_timeprd_xjoin
-FROM npmrds_2021_nhstmc_txt tmc
+FROM npmrds_2020_alltmc_txt tmc
 	CROSS JOIN #epochs_x_hod eh
 
 --compare, for each TMC, total observed epochs vs. total possible epochs for the year
@@ -94,7 +94,7 @@ SELECT
 	COUNT(tt.measurement_tstamp) * 1.0 / xj.poss_epochs_hod AS data_compl_pct
 INTO #data_to_pivot
 FROM #tmc_timeprd_xjoin xj
-	LEFT JOIN npmrds_2021_nhstmc_paxtruck_comb tt
+	LEFT JOIN npmrds_2020_alltmc_paxtruck_comb tt
 		ON xj.tmc = tt.tmc_code
 			AND xj.hour_of_day = DATEPART(hh, tt.measurement_tstamp)
 	--JOIN #epochs_x_hod eh
@@ -110,7 +110,7 @@ GROUP BY xj.tmc,
 ORDER BY
 	xj.tmc, xj.hour_of_day
 
---select * from #data_to_pivot
+
 
 --make pivot table showing data completness pct by hour of day
 SELECT * FROM (
@@ -153,6 +153,15 @@ PIVOT (
 		)
 	) piv
 
+--select * from #data_to_pivot
+
+SELECT
+	f_system,	
+	data_year,
+	hour_of_day,
+	AVG(ISNULL(data_compl_pct, 0)) AS avg_data_compl_pct
+FROM #data_to_pivot
+GROUP BY f_system, data_year, hour_of_day
 
 /*
 DROP TABLE #calendar_tbl

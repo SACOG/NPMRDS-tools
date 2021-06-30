@@ -28,8 +28,8 @@ arcpy.env.overwriteOutput = True
 
 start_time = str(dt.datetime.now().strftime('%m%d%Y_%H%M'))
 
-arcpy.env.workspace = r'I:\Projects\Darren\PPA_V2_GIS\PPA_V2.gdb'
-tmc_csv = r"P:\NPMRDS data\Raw Downloads\DynamicData_15Min\2018\TMC_Identification_removeDupes.csv"
+arcpy.env.workspace = r'Q:\SACSIM23\network_update\SACSIM23NetUpdate\SACSIM23NetUpdate.gdb'
+tmc_csv = r"P:\NPMRDS data\Raw Downloads\DynamicData_15Min\2019\TMC_identification.csv"
 
 output_fc = 'TMC_from_latlong_sacogRegn{}'.format(start_time)
 

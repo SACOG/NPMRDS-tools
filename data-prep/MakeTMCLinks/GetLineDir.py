@@ -85,11 +85,16 @@ class GetAngle(object):
         with arcpy.da.UpdateCursor(line_fc_out,fields) as tmc_uc:
             for row in tmc_uc:
                 counter += 1
-                start_lat = row[fields.index("SHAPE@")].firstPoint.Y
-                start_lon = row[fields.index("SHAPE@")].firstPoint.X
-                end_lat = row[fields.index("SHAPE@")].lastPoint.Y
-                end_lon = row[fields.index("SHAPE@")].lastPoint.X
-                #print(start_lat, start_lon, end_lat, end_lon)
+                line_geom = row[fields.index("SHAPE@")]
+
+                if line_geom is None:
+                    print(f"The following row had no geometry and was thus not included:\n\t{row}")
+                    continue
+
+                start_lat = line_geom.firstPoint.Y
+                start_lon = line_geom.firstPoint.X
+                end_lat = line_geom.lastPoint.Y
+                end_lon = line_geom.lastPoint.X
                 
                 link_angle = self.get_card_angle(start_lon, start_lat, end_lon, end_lat)
                 link_dir = self.get_card_dir(link_angle)
