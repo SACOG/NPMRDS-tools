@@ -53,10 +53,7 @@ class ParamCSV:
         out_attr = self.params_df[self.paramvalcol].loc[idxval]
         if out_attr is np.nan:
             out_attr = None
-        # import pdb; pdb.set_trace()
         return out_attr
-    
-test = ParamCSV(r"C:\Users\dconly\GitRepos\NPMRDS-tools\data-prep\LoadRawData\data_load_parameters.csv")
         
 
 
@@ -153,8 +150,6 @@ class DataSet():
         if comb_data_dir:
             self.data_comb = RawTTCSV(comb_data_dir, data_year, 'all', tmc_extent=self.tmc_extent, tbl_name_addl='')
             self.data_dir_list.append(self.data_comb)
-            
-        # import pdb; pdb.set_trace()
         
         # get TMC specification CSV
         first_data_dir = self.data_dir_list[0].data_dir
