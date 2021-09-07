@@ -32,7 +32,8 @@ If you've never used the data loader on your machine, you must first set the fol
 
 *Normal run instructions*
 
-Open "data_load_parameters.csv" and update the input parameter values as applicable, then run the script.
+1. Unzip the downloaded NPMRDS data (extract to a new child folder; don't unzip everything to the current folder)
+2. Open "data_load_parameters.csv" and update the input parameter values as applicable, then run the script.
 
 
 

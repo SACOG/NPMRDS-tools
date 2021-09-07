@@ -225,5 +225,6 @@ def do_work(param_csv):
     loader.load_tmc_spectbl(dt_columns=['active_start_date', 'active_end_date'])
 
 if __name__ == '__main__':
+    print(os.getcwd())
     do_work('data_load_parameters.csv')
     
