@@ -81,7 +81,6 @@ class RawTTCSV():
         self.data_dir = data_dir
         self.csv_name = f"{os.path.basename(self.data_dir)}.csv"
         self.csv_path = os.path.join(self.data_dir, self.csv_name)
-        # import pdb; pdb.set_trace()
         
         # build a table name for SQL server
         self.vehtype_dict = {'all': 'paxtruck_comb', 'passenger': 'paxveh',

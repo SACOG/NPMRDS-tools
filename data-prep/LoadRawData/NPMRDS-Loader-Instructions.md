@@ -28,12 +28,22 @@ If you've never used the data loader on your machine, you must first set the fol
 
 1. DataSet.server - set to the name of the instance of SQL Server you're connecting to
 2. DataSet.database - set to the name of the database you're loading to
-3. 
 
 *Normal run instructions*
 
 1. Unzip the downloaded NPMRDS data (extract to a new child folder; don't unzip everything to the current folder)
 2. Open "data_load_parameters.csv" and update the input parameter values as applicable, then run the script.
+
+*Specifying columns*
+
+As of January 2022, the travel time data table uses the following columns. If the data table you download has columns that are different, the table will not load correctly to the database.
+
+* tmc_code
+* measurement_tstamp
+* speed
+* reference_speed
+* travel_time_seconds
+* data_density
 
 
 

@@ -12,7 +12,6 @@ SELECT
 	tmc_code,
 	REPLACE(measurement_tstamp, '''','') AS measurement_tstamp,
 	speed,
-	average_speed,
 	reference_speed,
 	travel_time_seconds,
 	data_density	
