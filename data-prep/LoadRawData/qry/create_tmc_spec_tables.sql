@@ -48,7 +48,7 @@ CREATE TABLE {0} ( --name of staging table
 	isprimary smallint NULL,
 	active_start_date varchar(max) NULL,
 	active_end_date varchar(max) NULL,
-	thrulanes_unidir smallint NULL,
+	thrulanes_unidir real NULL,
 	aadt_unidir int NULL,
 	aadt_singl_unidir int NULL,
 	aadt_combi_unidir int NULL
@@ -94,7 +94,7 @@ CREATE TABLE {1} ( --name of final table
 	isprimary smallint NULL,
 	active_start_date datetime NULL,
 	active_end_date datetime NULL,
-	thrulanes_unidir smallint NULL,
+	thrulanes_unidir real NULL,
 	aadt_unidir int NULL,
 	aadt_singl_unidir int NULL,
 	aadt_combi_unidir int NULL
