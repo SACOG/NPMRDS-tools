@@ -93,7 +93,11 @@ CREATE TABLE {1} ( --name of final table
 	truck smallint NULL,
 	isprimary smallint NULL,
 	active_start_date datetime NULL,
-	active_end_date datetime NULL
+	active_end_date datetime NULL,
+	thrulanes_unidir smallint NULL,
+	aadt_unidir int NULL,
+	aadt_singl_unidir int NULL,
+	aadt_combi_unidir int NULL
 )
 
 

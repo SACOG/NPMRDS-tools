@@ -123,7 +123,6 @@ class BCP():
         '''
         
         print(f"\tquoting timestamp cols {tstamp_cols} so it can be read into SQL Server...")
-        import csv
         
         def clean_tstamp_format(in_tstamp_str, re_expn=None):
             if re_dt_format:
@@ -140,35 +139,46 @@ class BCP():
             else:
                 return f"'{in_tstamp_str}'"
         
-        
-        
         try:
             temp_output_file = f"{os.path.splitext(os.path.basename(in_file))[0]}_str_ts.csv"
             output_dir = os.path.dirname(in_file)
             temp_output_fpath = os.path.join(output_dir, temp_output_file)
-            
-            f_out = open(temp_output_fpath, 'w', newline='')
-            writer_out = csv.writer(f_out, delimiter=',')
-            
-            with open(in_file, 'r') as f_in:
-                reader = csv.DictReader(f_in)
-                for i, row in enumerate(reader):
-                    for tstamp_col in tstamp_cols:
-                        tstamp_val = row[tstamp_col]
-                        tstamp_val2 = clean_tstamp_format(tstamp_val, re_dt_format) 
-                        row[tstamp_col] = tstamp_val2
-                    
-                    if i == 0:
-                        writer_out.writerow(list(row.keys()))
-                        writer_out.writerow(list(row.values()))
-                    else:
-                        writer_out.writerow(list(row.values()))
+
+            # check if ts quoting file already created and has rows.
+            existing_ts_file = False
+            if os.path.exists(temp_output_fpath):
+                from itertools import count
+                with open(in_file, 'r') as f_in: 
+                    rowcnt = sum(1 for _ in f_in)
+                if rowcnt > 100:
+                    print(f"{temp_output_fpath} already exists, so skipping its creation...") 
+                    existing_ts_file = True 
+
+            # if it doesn't exist, then create it.
+            if not existing_ts_file:
+                f_out = open(temp_output_fpath, 'w', newline='')
+                writer_out = csv.writer(f_out, delimiter=',')
+                
+                with open(in_file, 'r') as f_in:
+                    reader = csv.DictReader(f_in)
+                    for i, row in enumerate(reader):
+                        for tstamp_col in tstamp_cols:
+                            tstamp_val = row[tstamp_col]
+                            tstamp_val2 = clean_tstamp_format(tstamp_val, re_dt_format) 
+                            row[tstamp_col] = tstamp_val2
                         
-                    if i % 1000000 == 0: print(f"\t{i} rows quoted...")
+                        if i == 0:
+                            writer_out.writerow(list(row.keys()))
+                            writer_out.writerow(list(row.values()))
+                        else:
+                            writer_out.writerow(list(row.values()))
+                            
+                        if i % 1000000 == 0: print(f"\t{i} rows quoted...")
+                
+                writer_out.close()
             
             return temp_output_fpath
-            
-            writer_out.close()
+        
         except:
             err_msg = f"Error adding quotes to date-time field. More info: {trace()}"
             raise Exception(err_msg)

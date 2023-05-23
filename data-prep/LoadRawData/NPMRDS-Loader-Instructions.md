@@ -41,6 +41,7 @@ As of January 2022, the travel time data table uses the following columns. If th
 * tmc_code
 * measurement_tstamp
 * speed
+* average_speed
 * reference_speed
 * travel_time_seconds
 * data_density
