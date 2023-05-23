@@ -22,6 +22,7 @@ Python Version: 3.x
 """
 
 import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -128,7 +129,7 @@ class DataSet():
         
         # queries to run
         self.script_dir = os.path.dirname(os.path.realpath(__file__))
-        self.qry_dir = "qry" # os.path.join(self.script_dir, "qry")
+        self.qry_dir = os.path.join(self.script_dir, "qry")
         
         self.sql_create_tmcspec_tbls = "create_tmc_spec_tables.sql"
         self.sql_tmcspec_load2final = "tmc_spec_load2final.sql"
@@ -225,5 +226,7 @@ def do_work(param_csv):
 
 if __name__ == '__main__':
     print(os.getcwd())
-    do_work('data_load_parameters.csv')
+    scriptdir = Path(__file__).parent
+    param_file = str(scriptdir.joinpath('data_load_parameters.csv'))
+    do_work(param_file)
     

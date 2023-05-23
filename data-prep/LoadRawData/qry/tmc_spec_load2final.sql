@@ -47,7 +47,11 @@ SELECT
 	truck,
 	isprimary,
 	REPLACE(active_start_date, '''','') AS active_start_date,
-	REPLACE(active_end_date, '''','') AS active_end_date
+	REPLACE(active_end_date, '''','') AS active_end_date,
+	thrulanes_unidir,
+	aadt_unidir,
+	aadt_singl_unidir,
+	aadt_combi_unidir
 FROM {0} --name of staging table
 
 DROP TABLE {0} --remove staging table when finished to clean up
