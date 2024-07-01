@@ -40,18 +40,24 @@ class ParamCSV:
         self.idxtmcext = "TMCExt"
         
         self.paramvalcol = 'ParameterValue'
+        self.tt_csv_col = 'tt_csv_name'
         self.params_df = pd.read_csv(in_csv, index_col=self.idxcol)
         
         # These are the attributes you will use as inputs to run this script
-        self.dir_truck_data = self.get_attr(self.idxtruck)
-        self.dir_pax_data = self.get_attr(self.idxpax)            
-        self.dir_allveh_data = self.get_attr(self.idxallveh)   
+        self.dir_truck_data = self.get_attr(self.paramvalcol, self.idxtruck)
+        self.dir_pax_data = self.get_attr(self.paramvalcol, self.idxpax)            
+        self.dir_allveh_data = self.get_attr(self.paramvalcol, self.idxallveh)  
+
+        # travel time data csv name
+        self.ttcsv_truck = self.get_attr(self.tt_csv_col, self.idxtruck)
+        self.ttcsv_paxveh = self.get_attr(self.tt_csv_col, self.idxpax)
+        self.ttcsv_allveh = self.get_attr(self.tt_csv_col, self.idxallveh)
         
-        self.data_year = int(self.get_attr(self.idxyear))
-        self.tmcext = self.get_attr(self.idxtmcext)
+        self.data_year = int(self.get_attr(self.paramvalcol, self.idxyear))
+        self.tmcext = self.get_attr(self.paramvalcol, self.idxtmcext)
         
-    def get_attr(self, idxval):
-        out_attr = self.params_df[self.paramvalcol].loc[idxval]
+    def get_attr(self, paramcol, idxval):
+        out_attr = self.params_df[paramcol].loc[idxval]
         if out_attr is np.nan:
             out_attr = None
         return out_attr
@@ -59,7 +65,7 @@ class ParamCSV:
 
 
 class RawTTCSV():
-    def __init__(self, data_dir, data_year, vehtype, tmc_extent, tbl_name_addl=''):
+    def __init__(self, data_dir, data_year, vehtype, tmc_extent, tbl_name_addl='', csv_name=None):
         '''
         Parameters
         ----------
@@ -80,7 +86,11 @@ class RawTTCSV():
         '''
         # file path for data to load
         self.data_dir = data_dir
-        self.csv_name = f"{os.path.basename(self.data_dir)}.csv"
+
+        self.csv_name = csv_name
+        if not csv_name:
+            self.csv_name = f"{os.path.basename(self.data_dir)}.csv"
+
         self.csv_path = os.path.join(self.data_dir, self.csv_name)
         
         # build a table name for SQL server
@@ -102,26 +112,8 @@ class RawTTCSV():
 
 class DataSet():
     # define where the data are, file names, etc.
-    def __init__(self, data_year, truck_data_dir=None, pax_data_dir=None, comb_data_dir=None, tmc_extent='all'):
-        '''
-        Parameters
-        ----------
-        data_year :
-            Data year
-        truck_tt_data : TYPE, optional
-            DESCRIPTION. directory of the truck travel time data
-        pax_tt_data : TYPE, optional
-            DESCRIPTION. directory of the passenger vehicle travel time data
-        comb_tt_data : TYPE, optional
-            DESCRIPTION. directory of the combiend truck + pax vehicle travel time data
-        tmc_spec : TYPE, optional
-            DESCRIPTION. CSV of unique TMCs and all TMC-level attributes
+    def __init__(self, param_obj):
 
-        Returns
-        -------
-        None.
-
-        '''
         #db connection info
         self.server = 'SQL-SVR'
         self.database = 'NPMRDS'
@@ -137,24 +129,27 @@ class DataSet():
         self.sql_tt_load2final = 'tt_tbl_load2final.sql'
         
         
-        self.tmc_extent = f"{tmc_extent}tmc"
+        self.tmc_extent = f"{param_obj.tmcext}tmc"
         
         
         self.data_dir_list = []
-        if truck_data_dir:
-            self.data_truck = RawTTCSV(truck_data_dir, data_year, 'truck', tmc_extent=self.tmc_extent, tbl_name_addl='')
+        if param_obj.dir_truck_data:
+            self.data_truck = RawTTCSV(param_obj.dir_truck_data, param_obj.data_year, 'truck', tmc_extent=self.tmc_extent,
+                                       csv_name=param_obj.ttcsv_truck)
             self.data_dir_list.append(self.data_truck)
-        if pax_data_dir:
-            self.data_pax = RawTTCSV(pax_data_dir, data_year, 'passenger', tmc_extent=self.tmc_extent, tbl_name_addl='')
+        if param_obj.dir_pax_data:
+            self.data_pax = RawTTCSV(param_obj.dir_pax_data, param_obj.data_year, 'passenger', tmc_extent=self.tmc_extent,
+                                       csv_name=param_obj.ttcsv_paxveh)
             self.data_dir_list.append(self.data_pax)
-        if comb_data_dir:
-            self.data_comb = RawTTCSV(comb_data_dir, data_year, 'all', tmc_extent=self.tmc_extent, tbl_name_addl='')
+        if param_obj.dir_allveh_data:
+            self.data_comb = RawTTCSV(param_obj.dir_allveh_data, param_obj.data_year, 'all', tmc_extent=self.tmc_extent,
+                                       csv_name=param_obj.ttcsv_allveh)
             self.data_dir_list.append(self.data_comb)
         
         # get TMC specification CSV
         first_data_dir = self.data_dir_list[0].data_dir
         self.tmc_spec_csv = os.path.join(first_data_dir, "TMC_Identification.csv")
-        self.tmc_spec_tblname = f"npmrds_{data_year}_{self.tmc_extent}_txt"
+        self.tmc_spec_tblname = f"npmrds_{param_obj.data_year}_{self.tmc_extent}_txt"
         self.speccol_startdate = 'active_start_date'
         self.speccol_enddate = 'active_end_date'
         
@@ -192,7 +187,7 @@ class DataSet():
         
     
     #load specified tables to SQL server
-    def load_to_sql(self, load_tmc_spectable=True):
+    def load_to_sql(self):
         qry_load2svr = os.path.join(self.qry_dir, self.sql_create_tt_tbls)
         qry_load2final = os.path.join(self.qry_dir, self.sql_tt_load2final)
 
@@ -208,24 +203,16 @@ class DataSet():
                                                      tbl_name=data.sql_server_table_name,
                                                      dt_cols=self.cols_timestamp,
                                                      str_load2final_sql=str_sql_load2final)
-            
-        if load_tmc_spectable:
-            self.load_tmc_spectbl(dt_columns=[self.speccol_startdate, self.speccol_enddate])
                 
 def do_work(param_csv):
     params = ParamCSV(param_csv)
     
-    loader = DataSet(data_year=params.data_year, 
-                     truck_data_dir=params.dir_truck_data,
-                     pax_data_dir=params.dir_pax_data,
-                     comb_data_dir=params.dir_allveh_data, 
-                     tmc_extent=params.tmcext)
-    
-    loader.load_to_sql(load_tmc_spectable=False)
+    loader = DataSet(params)
+
+    loader.load_to_sql()
     loader.load_tmc_spectbl(dt_columns=['active_start_date', 'active_end_date'])
 
 if __name__ == '__main__':
-    print(os.getcwd())
     scriptdir = Path(__file__).parent
     param_file = str(scriptdir.joinpath('data_load_parameters.csv'))
     do_work(param_file)

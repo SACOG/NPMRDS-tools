@@ -156,26 +156,24 @@ class BCP():
 
             # if it doesn't exist, then create it.
             if not existing_ts_file:
-                f_out = open(temp_output_fpath, 'w', newline='')
-                writer_out = csv.writer(f_out, delimiter=',')
-                
-                with open(in_file, 'r') as f_in:
-                    reader = csv.DictReader(f_in)
-                    for i, row in enumerate(reader):
-                        for tstamp_col in tstamp_cols:
-                            tstamp_val = row[tstamp_col]
-                            tstamp_val2 = clean_tstamp_format(tstamp_val, re_dt_format) 
-                            row[tstamp_col] = tstamp_val2
-                        
-                        if i == 0:
-                            writer_out.writerow(list(row.keys()))
-                            writer_out.writerow(list(row.values()))
-                        else:
-                            writer_out.writerow(list(row.values()))
+                with open(temp_output_fpath, 'w', newline='') as f_out:
+                    writer_out = csv.writer(f_out, delimiter=',')
+                    
+                    with open(in_file, 'r') as f_in:
+                        reader = csv.DictReader(f_in)
+                        for i, row in enumerate(reader):
+                            for tstamp_col in tstamp_cols:
+                                tstamp_val = row[tstamp_col]
+                                tstamp_val2 = clean_tstamp_format(tstamp_val, re_dt_format) 
+                                row[tstamp_col] = tstamp_val2
                             
-                        if i % 1000000 == 0: print(f"\t{i} rows quoted...")
-                
-                writer_out.close()
+                            if i == 0:
+                                writer_out.writerow(list(row.keys()))
+                                writer_out.writerow(list(row.values()))
+                            else:
+                                writer_out.writerow(list(row.values()))
+                                
+                            if i % 1000000 == 0: print(f"\t{i} rows quoted...")
             
             return temp_output_fpath
         
@@ -309,6 +307,7 @@ class BCP():
             elapsed_time = round((time.perf_counter() - start_time)/60,1)
             print(("Successfully loaded table in {}mins!\n".format(elapsed_time)))
         except:
+            import pdb; pdb.set_trace()
             print("BCP load fail. Things to try or check:\n" \
                   "1 - Make sure you are calling the correct SQL file to create the table\n" \
                   "2 - Make sure your SQL script is specifying correct columns and data types\n" \
