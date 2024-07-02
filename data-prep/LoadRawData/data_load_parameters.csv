@@ -1,6 +1,6 @@
 ParamIdxName,ParameterDescription,ParameterValue,tt_csv_name,Notes
-DataTruck,Truck Data Folder,E:\NPMRDS Backups\Raw Downloads\DynamicData_15Min\2023\inrix2023trucks,inrix2023.csv,Leave blank if not loading
-DataAllVeh,Truck-Passenger Combined Data Folder,E:\NPMRDS Backups\Raw Downloads\DynamicData_15Min\2023\inrix2023allveh,inrix2023.csv,Leave blank if not loading
-DataPax,Passenger Vehicle Data Folder,E:\NPMRDS Backups\Raw Downloads\DynamicData_15Min\2023\inrix2023paxveh,inrix2023.csv,Leave blank if not loading
+DataTruck,Truck Data Folder,,inrix2023.csv,Leave blank if not loading
+DataAllVeh,Truck-Passenger Combined Data Folder,,inrix2023.csv,Leave blank if not loading
+DataPax,Passenger Vehicle Data Folder,,inrix2023.csv,Leave blank if not loading
 Year,Data Year,2023,,Enter as 4-digit year
 TMCExt,TMC Network Extent ('nhs' or 'all'),all,,Must enter 'nhs' or 'all'
