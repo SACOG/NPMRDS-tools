@@ -6,8 +6,8 @@ CREATE TABLE {} ( --table name
 	speed real NULL,
 	average_speed real NULL,
 	reference_speed real NULL,
-	travel_time_seconds real NULL,
-	data_density varchar(1) NULL
+	travel_time_seconds real NULL
+	--data_density varchar(1) NULL
 )
 
 

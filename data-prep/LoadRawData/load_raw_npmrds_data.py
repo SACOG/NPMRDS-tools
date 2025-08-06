@@ -23,6 +23,7 @@ Python Version: 3.x
 
 import os
 from pathlib import Path
+import zipfile
 
 import numpy as np
 import pandas as pd
@@ -128,21 +129,23 @@ class DataSet():
         self.sql_create_tt_tbls = 'create_tt_table_2ph.sql'
         self.sql_tt_load2final = 'tt_tbl_load2final.sql'
         
-        
         self.tmc_extent = f"{param_obj.tmcext}tmc"
         
         
         self.data_dir_list = []
         if param_obj.dir_truck_data:
-            self.data_truck = RawTTCSV(param_obj.dir_truck_data, param_obj.data_year, 'truck', tmc_extent=self.tmc_extent,
+            truckfolder = self.extract_data_set(param_obj.dir_truck_data)
+            self.data_truck = RawTTCSV(truckfolder, param_obj.data_year, 'truck', tmc_extent=self.tmc_extent,
                                        csv_name=param_obj.ttcsv_truck)
             self.data_dir_list.append(self.data_truck)
         if param_obj.dir_pax_data:
-            self.data_pax = RawTTCSV(param_obj.dir_pax_data, param_obj.data_year, 'passenger', tmc_extent=self.tmc_extent,
+            paxfolder = self.extract_data_set(param_obj.dir_pax_data)
+            self.data_pax = RawTTCSV(paxfolder, param_obj.data_year, 'passenger', tmc_extent=self.tmc_extent,
                                        csv_name=param_obj.ttcsv_paxveh)
             self.data_dir_list.append(self.data_pax)
         if param_obj.dir_allveh_data:
-            self.data_comb = RawTTCSV(param_obj.dir_allveh_data, param_obj.data_year, 'all', tmc_extent=self.tmc_extent,
+            allvehfolder = self.extract_data_set(param_obj.dir_allveh_data)
+            self.data_comb = RawTTCSV(allvehfolder, param_obj.data_year, 'all', tmc_extent=self.tmc_extent,
                                        csv_name=param_obj.ttcsv_allveh)
             self.data_dir_list.append(self.data_comb)
         
@@ -155,6 +158,15 @@ class DataSet():
         
         # columns
         self.cols_timestamp = ['measurement_tstamp']
+
+    def extract_data_set(self, in_zip):
+        in_zip = Path(in_zip)
+        dest_dir = in_zip.parent.joinpath(in_zip.stem)
+
+        with zipfile.ZipFile(in_zip, 'r') as zip_ref:
+            zip_ref.extractall(dest_dir)
+        
+        return dest_dir
     
     def sql_str_from_file(self, in_sql_file, *formatter_args):
         '''PARAMETERS:

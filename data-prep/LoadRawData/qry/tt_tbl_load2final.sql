@@ -11,11 +11,11 @@ INSERT INTO {1} --name of final table
 SELECT
 	tmc_code,
 	REPLACE(measurement_tstamp, '''','') AS measurement_tstamp,
-	speed,
-	historical_average_speed,
-	reference_speed,
-	travel_time_seconds,
-	data_density	
+	CAST(speed AS SMALLINT) AS speed,
+	CAST(historical_average_speed AS SMALLINT) AS historical_average_speed,
+	CAST(reference_speed AS SMALLINT) AS reference_speed,
+	travel_time_seconds
+	--data_density	
 FROM {0} --name of staging table
 
 DROP TABLE {0} --remove staging table when finished to clean up

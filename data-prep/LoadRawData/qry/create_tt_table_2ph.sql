@@ -23,19 +23,19 @@ CREATE TABLE {0} ( --name of staging table
 	speed real NULL,
 	historical_average_speed real NULL,
 	reference_speed real NULL,
-	travel_time_seconds real NULL,
-	data_density varchar(1) NULL
+	travel_time_seconds real NULL
+	--data_density varchar(1) NULL
 )
 
 
 CREATE TABLE {1} ( --name of final table
 	tmc_code varchar(9) NULL,
 	measurement_tstamp datetime NULL,
-	speed real NULL,
-	historical_average_speed real NULL,
-	reference_speed real NULL,
-	travel_time_seconds real NULL,
-	data_density varchar(1) NULL
+	speed smallint NULL, --note that final table converts speeds to smallint data type to save storage
+	historical_average_speed smallint NULL,
+	reference_speed smallint NULL,
+	travel_time_seconds real NULL
+	--data_density varchar(1) NULL
 )
 
 
