@@ -38,15 +38,14 @@ def get_odbc_driver():
     
 # extract SQL Server query results into a pandas dataframe   
 def sqlqry_to_df(query_str, dbname, servername='SQL-SVR', trustedconn='yes'):   
-    # consider using connectorx for this; supposedly makes loading much faster
-    # https://sfu-db.github.io/connector-x/intro.html
 
     driver = get_odbc_driver()  
 
     conn_str = f"DRIVER={driver};" \
         f"SERVER={servername};" \
         f"DATABASE={dbname};" \
-        f"Trusted_Connection={trustedconn}"
+        f"Trusted_Connection={trustedconn};" \
+        f"TrustServerCertificate=yes"
         
     conn_str = urllib.parse.quote_plus(conn_str)
     engine = sqla.create_engine(f"mssql+pyodbc:///?odbc_connect={conn_str}")
@@ -57,13 +56,13 @@ def sqlqry_to_df(query_str, dbname, servername='SQL-SVR', trustedconn='yes'):
     print("Executing query. Results loading into dataframe...")
     try:
         df = pd.read_sql_query(sql=query_str, con=engine)
-    except ResourceClosedError:
+    except sqla.exc.ResourceClosedError:
         msg = """ResourceClosedError. Ensure that the query returns rows and that you have the following at the start of your query:
         SET ANSI_WARNINGS OFF 
         SET NOCOUNT ON
         """
         raise Exception(msg)
-        
+    
     rowcnt = df.shape[0]
     
     et_mins = round((perf() - start_time) / 60, 2)
